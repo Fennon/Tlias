@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.EmpMapper">
+    <update id="update">
+        UPDATE emp
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="job != null and job != ''">
+                job = #{job},
+            </if>
+            <if test="salary != null">
+                salary = #{salary},
+            </if>
+            <if test="image != null and image != ''">
+                image = #{image},
+            </if>
+            <if test="entryDate != null">
+                entry_date = #{entryDate},
+            </if>
+            <if test="deptId != null">
+                dept_id = #{deptId},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <delete id="deltetByIds">
+        delete from emp where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")" >
+            #{id}
+        </foreach>
+
+    </delete>
+
+
+    <select id="list" resultType="org.example.pojo.Emp">
+        select e.*, d.name deptName from emp e left join dept d on e.dept_id = d.id
+        <where>
+            <if test="name !=null or name !='' ">
+                e.name like concat('%',#{name},'%')
+            </if>
+
+            <if test="gender !=null">
+                and e.gender = #{gender}
+            </if>
+
+            <if test="begin !=null and end != null">
+                and e.entry_date between #{begin} and #{end}
+            </if>
+
+
+        </where>
+        order by e.update_time desc
+    </select>
+    <select id="countEmpJobData" resultType="java.util.Map">
+        select
+        (case when job=1 then '班主任'
+        when job=2 then '讲师'
+        when job=3 then '学工主管'
+        when job=4 then '教研主管'
+        when job=5 then '咨询师'
+        else '其他' end) 'pos',
+        count(*) 'num'
+        from emp group by job order by num;
+    </select>
+    <select id="countEmpGenderData" resultType="java.util.Map">
+        select (case when gender=1 then '男性员工'
+        when gender=2 then '女性员工' end) 'name',
+        count(*) 'value'
+        from emp group by gender;
+    </select>
+
+</mapper>

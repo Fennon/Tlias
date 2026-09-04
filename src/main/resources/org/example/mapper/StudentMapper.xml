@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.StudentMapper">
+    <insert id="insertStudent">
+        INSERT INTO student (
+        name,
+        no,
+        gender,
+        phone,
+        degree,
+        clazz_id
+        <if test="idCard != null and idCard != ''">,id_card</if>
+        <if test="isCollege != null">,is_college</if>
+        <if test="address != null and address != ''">,address</if>
+        <if test="graduationDate != null">,graduation_date</if>
+        ,violation_count,
+        violation_score,
+        create_time,
+        update_time
+        ) VALUES (
+        #{name},
+        #{no},
+        #{gender},
+        #{phone},
+        #{degree},
+        #{clazzId}
+        <if test="idCard != null and idCard != ''">,#{idCard}</if>
+        <if test="isCollege != null">,#{isCollege}</if>
+        <if test="address != null and address != ''">,#{address}</if>
+        <if test="graduationDate != null">,#{graduationDate}</if>
+        ,#{violationCount},
+        #{violationScore},
+        #{createTime},
+        #{updateTime}
+        )
+    </insert>
+    <update id="update">
+        UPDATE student
+        <trim prefix="SET" suffixOverrides=",">
+            name = #{name},
+            no = #{no},
+            gender = #{gender},
+            phone = #{phone},
+            degree = #{degree},
+            clazz_id = #{clazzId},
+            <if test="idCard != null and idCard != ''">id_card = #{idCard},</if>
+            <if test="isCollege != null">is_college = #{isCollege},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="graduationDate != null">graduation_date = #{graduationDate},</if>
+            violation_count = #{violationCount},
+            violation_score = #{violationScore},
+            update_time = #{updateTime}
+        </trim>
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteByIds">
+        delete from student where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")" >
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <select id="selectAll" resultType="org.example.pojo.Student">
+        select s.*, c.name clazz_name
+        from student s
+        left join clazz c on s.clazz_id = c.id
+        <where>
+            <!-- 姓名模糊查询 -->
+            <if test="name != null and name != ''">
+                s.name like concat('%', #{name}, '%')
+            </if>
+            <!-- 学历精确匹配 -->
+            <if test="degree != null">
+                and s.degree = #{degree}
+            </if>
+            <!-- 班级ID精确匹配 -->
+            <if test="clazzId != null">
+                and s.clazz_id = #{clazzId}
+            </if>
+        </where>
+        order by s.update_time desc
+    </select>
+    <select id="getClazzStudentCount" resultType="java.util.Map">
+        SELECT c.name clazz, COUNT(s.id) AS num
+        FROM clazz c
+        LEFT JOIN student s ON c.id = s.clazz_id
+        GROUP BY c.id;
+    </select>
+    <select id="countStudentDegreeData" resultType="java.util.Map">
+        SELECT
+        CASE degree
+        WHEN 1 THEN '初中'
+        WHEN 2 THEN '高中'
+        WHEN 3 THEN '大专'
+        WHEN 4 THEN '本科'
+        WHEN 5 THEN '硕士'
+        WHEN 6 THEN '博士'
+        ELSE '未知'
+        END AS name,
+        COUNT(id) AS value
+        FROM student
+        GROUP BY degree
+        ORDER BY degree;
+    </select>
+</mapper>
