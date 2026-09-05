@@ -1,7 +1,6 @@
 package org.example.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Delete;
 import org.example.pojo.Clazz;
 import org.example.pojo.ClazzQueryParam;
 import org.example.pojo.PageResult;
@@ -10,7 +9,6 @@ import org.example.service.ClazzService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @Slf4j
