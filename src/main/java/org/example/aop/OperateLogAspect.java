@@ -10,6 +10,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.example.anno.Log;
 import org.example.mapper.OperateLogMapper;
 import org.example.pojo.OperateLog;
+import org.example.utils.CurrentHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +56,7 @@ public class OperateLogAspect {
             operateLog.setCostTime(costTime);
 
             // ----------------操作人ID----------------
+            operateLog.setOperateEmpId(CurrentHolder.getCurrentId());
             
 
             // 保存日志
